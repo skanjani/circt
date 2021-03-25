@@ -18,10 +18,13 @@ def InstanceOp : FIRRTLOp<"instance"> {
   }];
 
   let arguments = (ins FlatSymbolRefAttr:$moduleName,
-                       StrArrayAttr:$portNames, OptionalAttr<StrAttr>:$name);
+                       StrArrayAttr:$portNames, OptionalAttr<StrAttr>:$name,
+                       DefaultValuedAttr<AnnotationArrayAttr,
+                                         "{}">:$annotations);
   let results = (outs Variadic<FIRRTLType>:$results);
 
-  let assemblyFormat = "$moduleName attr-dict (`:` type($results)^ )?";
+  let assemblyFormat =
+    "$moduleName custom<InstanceOp>(attr-dict) (`:` type($results)^ )?";
 
   let verifier = "return ::verifyInstanceOp(*this);";
 
