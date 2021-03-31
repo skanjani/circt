@@ -1102,6 +1102,31 @@ private:
 
   // Extra information maintained across a module.
   FIRModuleContext &moduleContext;
+
+public:
+  /// Utility to get the CircuitTarget
+  std::string getCircuitTarget() {
+    return "~" + builder.getBlock()
+                     ->getParentOp()
+                     ->getParentOfType<CircuitOp>()
+                     .name()
+                     .str();
+  }
+
+  /// Utility to get the ModuleTarget
+  std::string getModuleTarget() {
+    auto module =
+        dyn_cast_or_null<FModuleOp>(builder.getBlock()->getParentOp());
+    if (module)
+      return getCircuitTarget() + "|" + module.getName().str();
+
+    return getCircuitTarget() + "|" +
+           builder.getBlock()
+               ->getParent()
+               ->getParentOfType<FModuleOp>()
+               .getName()
+               .str();
+  }
 };
 
 } // end anonymous namespace
