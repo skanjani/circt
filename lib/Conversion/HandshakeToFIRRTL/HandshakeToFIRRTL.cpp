@@ -1721,9 +1721,9 @@ bool HandshakeBuilder::visitHandshake(MemoryOp op) {
     resultNames.push_back(rewriter.getStringAttr(p.first));
   }
 
-  auto memOp = rewriter.create<MemOp>(insertLoc, resultTypes, readLatency,
-                                      writeLatency, depth, ruw,
-                                      rewriter.getArrayAttr(resultNames), name);
+  auto memOp = rewriter.create<MemOp>(
+      insertLoc, resultTypes, readLatency, writeLatency, depth, ruw,
+      rewriter.getArrayAttr(resultNames), name, rewriter.getArrayAttr({}));
 
   // Prepare to create each load and store port logic.
   auto bitType = UIntType::get(rewriter.getContext(), 1);
