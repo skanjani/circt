@@ -58,10 +58,14 @@ def CMemOp : FIRRTLOp<"cmem", [/*MemAlloc*/]> {
 
 def SMemOp : FIRRTLOp<"smem", [/*MemAlloc*/]> {
   let summary = "Define a new smem";
-  let arguments = (ins RUWAttr:$ruw, OptionalAttr<StrAttr>:$name);
+  let arguments = (
+    ins RUWAttr:$ruw,
+        OptionalAttr<StrAttr>:$name,
+        DefaultValuedAttr<AnnotationArrayAttr, "{}">:$annotations);
   let results = (outs FIRRTLType:$result);
 
-  let assemblyFormat = "$ruw attr-dict `:` type($result)";
+  let assemblyFormat =
+    "$ruw custom<SMemOp>(attr-dict) `:` type($result)";
 }
 
 def MemOp : FIRRTLOp<"mem", [/*MemAlloc*/]> {
