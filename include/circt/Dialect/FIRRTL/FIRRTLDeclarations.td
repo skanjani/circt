@@ -151,11 +151,14 @@ def RegOp : FIRRTLOp<"reg", [/*MemAlloc*/]> {
     ```
     }];
 
-  let arguments = (ins ClockType:$clockVal, OptionalAttr<StrAttr>:$name);
+  let arguments = (
+    ins ClockType:$clockVal,
+      OptionalAttr<StrAttr>:$name,
+      DefaultValuedAttr<AnnotationArrayAttr, "{}">:$annotations);
   let results = (outs PassiveType:$result);
 
   let assemblyFormat =
-    "operands attr-dict `:` functional-type(operands, $result)";
+    "operands custom<ElideAnnotations>(attr-dict) `:` functional-type(operands, $result)";
 }
 
 def RegResetOp : FIRRTLOp<"regreset", [/*MemAlloc*/]> {
@@ -167,12 +170,14 @@ def RegResetOp : FIRRTLOp<"regreset", [/*MemAlloc*/]> {
     ```
     }];
 
-  let arguments = (ins ClockType:$clockVal, ResetType:$resetSignal,
-                       PassiveType:$resetValue, OptionalAttr<StrAttr>:$name);
+  let arguments = (
+    ins ClockType:$clockVal, ResetType:$resetSignal,
+        PassiveType:$resetValue, OptionalAttr<StrAttr>:$name,
+        DefaultValuedAttr<AnnotationArrayAttr, "{}">:$annotations);
   let results = (outs PassiveType:$result);
 
   let assemblyFormat =
-     "operands attr-dict `:` functional-type(operands, $result)";
+     "operands custom<ElideAnnotations>(attr-dict) `:` functional-type(operands, $result)";
 }
 
 def WireOp : FIRRTLOp<"wire", []> {

@@ -1046,8 +1046,9 @@ bool HandshakeBuilder::visitHandshake(ControlMergeOp op) {
 
   // Declare register for storing arbitration winner.
   auto wonName = rewriter.getStringAttr("won");
-  auto won = rewriter.create<RegResetOp>(insertLoc, indexType, clock, reset,
-                                         noWinner, wonName);
+  auto won =
+      rewriter.create<RegResetOp>(insertLoc, indexType, clock, reset, noWinner,
+                                  wonName, rewriter.getArrayAttr({}));
 
   // Declare wire for arbitration winner.
   auto winName = rewriter.getStringAttr("win");
@@ -1061,12 +1062,14 @@ bool HandshakeBuilder::visitHandshake(ControlMergeOp op) {
 
   // Declare registers for storing if each output has been emitted.
   auto resultEmittedName = rewriter.getStringAttr("resultEmitted");
-  auto resultEmitted = rewriter.create<RegResetOp>(
-      insertLoc, bitType, clock, reset, falseConst, resultEmittedName);
+  auto resultEmitted =
+      rewriter.create<RegResetOp>(insertLoc, bitType, clock, reset, falseConst,
+                                  resultEmittedName, rewriter.getArrayAttr({}));
 
   auto controlEmittedName = rewriter.getStringAttr("controlEmitted");
   auto controlEmitted = rewriter.create<RegResetOp>(
-      insertLoc, bitType, clock, reset, falseConst, controlEmittedName);
+      insertLoc, bitType, clock, reset, falseConst, controlEmittedName,
+      rewriter.getArrayAttr({}));
 
   // Declare wires for if each output is done.
   auto resultDoneName = rewriter.getStringAttr("resultDone");
@@ -1366,7 +1369,8 @@ bool HandshakeBuilder::buildForkLogic(ValueVector *input,
     // Create a emitted register.
     auto emtdName = rewriter.getStringAttr("emtd" + std::to_string(idx));
     auto emtdReg = rewriter.create<RegResetOp>(insertLoc, bitType, clock, reset,
-                                               falseConst, emtdName);
+                                               falseConst, emtdName,
+                                               rewriter.getArrayAttr({}));
 
     // Connect the emitted register with {doneWire && notallDoneWire}. Only if
     // notallDone, the emtdReg will be set to the value of doneWire. Otherwise,
@@ -1468,8 +1472,9 @@ void HandshakeBuilder::buildControlBufferLogic(Value predValid, Value predReady,
       insertLoc, bitType, readyRegWireName, rewriter.getArrayAttr({}));
 
   auto readyRegName = rewriter.getStringAttr("readyReg");
-  auto readyReg = rewriter.create<RegResetOp>(insertLoc, bitType, clock, reset,
-                                              falseConst, readyRegName);
+  auto readyReg =
+      rewriter.create<RegResetOp>(insertLoc, bitType, clock, reset, falseConst,
+                                  readyRegName, rewriter.getArrayAttr({}));
   rewriter.create<ConnectOp>(insertLoc, readyReg, readyRegWire);
 
   // Create the logic to drive the successor valid and potentially data.
@@ -1511,7 +1516,8 @@ void HandshakeBuilder::buildControlBufferLogic(Value predValid, Value predReady,
         createConstantOp(dataType, APInt(dataType.getBitWidthOrSentinel(), 0),
                          insertLoc, rewriter);
     auto ctrlDataReg = rewriter.create<RegResetOp>(
-        insertLoc, dataType, clock, reset, ctrlZeroConst, ctrlDataRegName);
+        insertLoc, dataType, clock, reset, ctrlZeroConst, ctrlDataRegName,
+        rewriter.getArrayAttr({}));
 
     rewriter.create<ConnectOp>(insertLoc, ctrlDataReg, ctrlDataRegWire);
 
@@ -1611,15 +1617,17 @@ bool HandshakeBuilder::buildSeqBufferLogic(int64_t numStage, ValueVector *input,
 
     // Create a register for valid signal.
     auto validRegName = rewriter.getStringAttr("validReg" + std::to_string(i));
-    auto validReg = rewriter.create<RegResetOp>(
-        insertLoc, bitType, clock, reset, falseConst, validRegName);
+    auto validReg = rewriter.create<RegResetOp>(insertLoc, bitType, clock,
+                                                reset, falseConst, validRegName,
+                                                rewriter.getArrayAttr({}));
 
     // Create registers for data signal.
     Value dataReg = nullptr;
     if (!isControl) {
       auto dataRegName = rewriter.getStringAttr("dataReg" + std::to_string(i));
       dataReg = rewriter.create<RegResetOp>(insertLoc, dataType, clock, reset,
-                                            zeroDataConst, dataRegName);
+                                            zeroDataConst, dataRegName,
+                                            rewriter.getArrayAttr({}));
     }
 
     // Create wires for valid, ready and data signal coming from the control
@@ -1877,7 +1885,8 @@ bool HandshakeBuilder::visitHandshake(MemoryOp op) {
         createConstantOp(bitType, APInt(1, 0), insertLoc, rewriter);
     auto bufferName = rewriter.getStringAttr("writeValidBuffer");
     auto writeValidBuffer = rewriter.create<RegResetOp>(
-        insertLoc, bitType, clock, reset, falseConst, bufferName);
+        insertLoc, bitType, clock, reset, falseConst, bufferName,
+        rewriter.getArrayAttr({}));
 
     // Connect the write valid buffer to the store control valid.
     rewriter.create<ConnectOp>(insertLoc, storeControlValid, writeValidBuffer);
