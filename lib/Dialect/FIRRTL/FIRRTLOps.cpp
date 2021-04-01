@@ -1761,10 +1761,17 @@ static void printImplicitSSAName(OpAsmPrinter &p, Operation *op,
     namesDisagree = true;
   }
 
-  if (namesDisagree)
-    p.printOptionalAttrDict(op->getAttrs());
-  else
-    p.printOptionalAttrDict(op->getAttrs(), {"name"});
+  SmallVector<StringRef, 2> elides;
+
+  if (!namesDisagree)
+    elides.push_back("name");
+
+  // Elide "annotations" if it doesn't exist or if it is empty
+  auto annotationsAttr = op->getAttrOfType<ArrayAttr>("annotations");
+  if (!annotationsAttr || annotationsAttr.size() == 0)
+    elides.push_back("annotations");
+
+  p.printOptionalAttrDict(op->getAttrs(), elides);
 }
 
 //===----------------------------------------------------------------------===//
