@@ -814,7 +814,7 @@ void FIRRTLModuleLowering::lowerInstance(InstanceOp oldInstance,
     // Otherwise, create a wire for each input/inout operand, so there is
     // something to connect to.
     auto name = builder.getStringAttr("." + port.getName().str() + ".wire");
-    auto wire = builder.create<WireOp>(port.type, name);
+    auto wire = builder.create<WireOp>(port.type, name, ArrayAttr());
 
     // Drop zero bit input/inout ports.
     if (!portType.isInteger(0)) {
